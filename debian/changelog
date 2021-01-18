@@ -1,0 +1,5 @@
+alertmanager-webhook-logger (0.2-1) unstable; urgency=medium
+
+  * Debian packaging, see also https://phabricator.wikimedia.org/T272474
+
+ -- Filippo Giunchedi <fgiunchedi@wikimedia.org>  Mon, 18 Jan 2021 16:46:30 +0100

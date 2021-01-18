@@ -1,0 +1,23 @@
+Source: alertmanager-webhook-logger
+Maintainer: Filippo Giunchedi <fgiunchedi@wikimedia.org>
+Section: devel
+Priority: optional
+Standards-Version: 4.3.0
+Build-Depends: debhelper (>= 12),
+               dh-golang,
+               golang-any,
+               golang-github-go-kit-kit-dev,
+               golang-github-prometheus-alertmanager-dev
+Homepage: https://github.com/tomtom-international/alertmanager-webhook-logger
+XS-Go-Import-Path: github.com/tomtom-international/alertmanager-webhook-logger
+Testsuite: autopkgtest-pkg-go
+
+Package: alertmanager-webhook-logger
+Architecture: any
+Built-Using: ${misc:Built-Using}
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Generates structured log messages from Prometheus AlertManager webhook notifier
+ The Prometheus Alertmanager does not provide any history of alerts. Logging of
+ alerts is the most simple solution to get that history. In combination with log
+ management solutions like Elastic Stack, etc. it should fit most use-cases for
+ a comfortable history of alerts.

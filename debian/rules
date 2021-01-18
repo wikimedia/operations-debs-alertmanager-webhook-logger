@@ -1,0 +1,8 @@
+#!/usr/bin/make -f
+
+override_dh_auto_install:
+	install -D -m 644 -o root -g root debian/alertmanager-webhook-logger.sysusers debian/alertmanager-webhook-logger/usr/lib/sysusers.d/alertmanager-webhook-logger.conf
+	dh_auto_install -- --no-source
+
+%:
+	dh $@ --buildsystem=golang --with=golang

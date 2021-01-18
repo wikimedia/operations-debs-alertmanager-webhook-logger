@@ -1,0 +1,204 @@
+Description: Vendor github.com/kami-zh/go-capturer
+ The module is quite simple and not in Debian yet, vendor it instead.
+Author: Filippo Giunchedi <fgiunchedi@wikimedia.org>
+
+---
+
+--- /dev/null
++++ alertmanager-webhook-logger-0.2/vendor/github.com/kami-zh/go-capturer/.travis.yml
+@@ -0,0 +1 @@
++language: go
+--- /dev/null
++++ alertmanager-webhook-logger-0.2/vendor/github.com/kami-zh/go-capturer/LICENSE
+@@ -0,0 +1,21 @@
++MIT License
++
++Copyright (c) 2017 kami
++
++Permission is hereby granted, free of charge, to any person obtaining a copy
++of this software and associated documentation files (the "Software"), to deal
++in the Software without restriction, including without limitation the rights
++to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++copies of the Software, and to permit persons to whom the Software is
++furnished to do so, subject to the following conditions:
++
++The above copyright notice and this permission notice shall be included in all
++copies or substantial portions of the Software.
++
++THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++SOFTWARE.
+--- /dev/null
++++ alertmanager-webhook-logger-0.2/vendor/github.com/kami-zh/go-capturer/README.md
+@@ -0,0 +1,65 @@
++# go-capturer
++
++[![GoDoc](https://godoc.org/github.com/kami-zh/go-capturer?status.svg)](https://godoc.org/github.com/kami-zh/go-capturer)
++[![Build Status](https://travis-ci.org/kami-zh/go-capturer.svg?branch=master)](https://travis-ci.org/kami-zh/go-capturer)
++[![Go Report Card](https://goreportcard.com/badge/github.com/kami-zh/go-capturer)](https://goreportcard.com/report/github.com/kami-zh/go-capturer)
++
++Capture `os.Stdout` and/or `os.Stderr` in Go.
++This package is useful for writing tests which print some outputs using `fmt` package.
++
++## Usage
++
++This package provides `CaptureStdout()`, `CaptureStderr()` and `CaptureOutput()` functions to capture outputs.
++
++```go
++package main
++
++import (
++	"fmt"
++	"os"
++
++	"github.com/kami-zh/go-capturer"
++)
++
++func ExampleCaptureStdout() {
++	out := capturer.CaptureStdout(func() {
++		fmt.Fprint(os.Stdout, "foo")
++	})
++
++	fmt.Println(out)
++	// Output: foo
++}
++
++func ExampleCaptureStderr() {
++	out := capturer.CaptureStderr(func() {
++		fmt.Fprint(os.Stderr, "bar")
++	})
++
++	fmt.Println(out)
++	// Output: bar
++}
++
++func ExampleCaptureOutput() {
++	out := capturer.CaptureOutput(func() {
++		fmt.Fprint(os.Stdout, "foo")
++		fmt.Fprint(os.Stderr, "bar")
++	})
++
++	fmt.Println(out)
++	// Output: foobar
++}
++```
++
++## Installation
++
++```
++$ go get github.com/kami-zh/go-capturer
++```
++
++## Contributing
++
++Bug reports and pull requests are welcome on GitHub at https://github.com/kami-zh/go-capturer.
++
++## License
++
++The package is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
+--- /dev/null
++++ alertmanager-webhook-logger-0.2/vendor/github.com/kami-zh/go-capturer/main.go
+@@ -0,0 +1,62 @@
++package capturer
++
++import (
++	"bytes"
++	"io"
++	"os"
++)
++
++// Capturer has flags whether capture stdout/stderr or not.
++type Capturer struct {
++	captureStdout bool
++	captureStderr bool
++}
++
++// CaptureStdout captures stdout.
++func CaptureStdout(f func()) string {
++	capturer := &Capturer{captureStdout: true}
++	return capturer.capture(f)
++}
++
++// CaptureStderr captures stderr.
++func CaptureStderr(f func()) string {
++	capturer := &Capturer{captureStderr: true}
++	return capturer.capture(f)
++}
++
++// CaptureOutput captures stdout and stderr.
++func CaptureOutput(f func()) string {
++	capturer := &Capturer{captureStdout: true, captureStderr: true}
++	return capturer.capture(f)
++}
++
++func (capturer *Capturer) capture(f func()) string {
++	r, w, err := os.Pipe()
++	if err != nil {
++		panic(err)
++	}
++
++	if capturer.captureStdout {
++		stdout := os.Stdout
++		os.Stdout = w
++		defer func() {
++			os.Stdout = stdout
++		}()
++	}
++
++	if capturer.captureStderr {
++		stderr := os.Stderr
++		os.Stderr = w
++		defer func() {
++			os.Stderr = stderr
++		}()
++	}
++
++	f()
++	w.Close()
++
++	var buf bytes.Buffer
++	io.Copy(&buf, r)
++
++	return buf.String()
++}
+--- /dev/null
++++ alertmanager-webhook-logger-0.2/vendor/github.com/kami-zh/go-capturer/main_test.go
+@@ -0,0 +1,34 @@
++package capturer
++
++import (
++	"fmt"
++	"os"
++)
++
++func ExampleCaptureStdout() {
++	out := CaptureStdout(func() {
++		fmt.Fprint(os.Stdout, "foo")
++	})
++
++	fmt.Println(out)
++	// Output: foo
++}
++
++func ExampleCaptureStderr() {
++	out := CaptureStderr(func() {
++		fmt.Fprint(os.Stderr, "bar")
++	})
++
++	fmt.Println(out)
++	// Output: bar
++}
++
++func ExampleCaptureOutput() {
++	out := CaptureOutput(func() {
++		fmt.Fprint(os.Stdout, "foo")
++		fmt.Fprint(os.Stderr, "bar")
++	})
++
++	fmt.Println(out)
++	// Output: foobar
++}

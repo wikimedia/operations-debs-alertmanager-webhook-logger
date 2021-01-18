@@ -1,0 +1,10 @@
+[Unit]
+Description=Alertmanager Webhook Logger
+
+[Service]
+Restart=always
+User=prometheus
+ExecStart=/usr/bin/alertmanager-webhook-logger
+
+[Install]
+WantedBy=multi-user.target
