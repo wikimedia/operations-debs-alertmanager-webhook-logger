@@ -1,3 +1,9 @@
+alertmanager-webhook-logger (0.3-1) unstable; urgency=medium
+
+  * New upstream release
+
+ -- Filippo Giunchedi <filippo@debian.org>  Mon, 22 Feb 2021 09:22:06 +0100
+
 alertmanager-webhook-logger (0.2-1) unstable; urgency=medium
 
   * Debian packaging, see also https://phabricator.wikimedia.org/T272474
